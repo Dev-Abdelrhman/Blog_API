@@ -1,0 +1,64 @@
+import {
+  Body,
+  Param,
+  Controller,
+  Post,
+  Get,
+  Patch,
+  Delete,
+  UsePipes,
+  ValidationPipe,
+  ParseIntPipe,
+  NotFoundException,
+} from '@nestjs/common';
+import { PostsService } from './posts.service';
+import { CreatePostDto } from './dtos/CreatePost.dto';
+import { UpdatePostDto } from './dtos/UpdatePost.dto';
+
+@Controller('posts')
+export class PostsController {
+  constructor(private readonly postsService: PostsService) {}
+  @Get()
+  async getAllPosts() {
+    return await this.postsService.getAllPosts();
+  }
+  @Post('user/:authorId')
+  @UsePipes(ValidationPipe)
+  async createPost(
+    @Param('authorId', ParseIntPipe) authorId: number,
+    @Body() CreatePostDto: CreatePostDto,
+  ) {
+    return await this.postsService.createPost(authorId, CreatePostDto);
+  }
+
+  @Get('user/:authorId')
+  async getAllPostsByAuthorId(
+    @Param('authorId', ParseIntPipe) authorId: number,
+  ) {
+    return await this.postsService.getAllPostsByAuthorId(authorId);
+  }
+
+  @Get('user/:authorId/:id')
+  async getPostById(
+    @Param('authorId', ParseIntPipe) authorId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return await this.postsService.getPostById(authorId, id);
+  }
+  @Patch('user/:authorId/:id')
+  @UsePipes(ValidationPipe)
+  async updatePost(
+    @Param('authorId', ParseIntPipe) authorId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() UpdatePostDto: UpdatePostDto,
+  ) {
+    return await this.postsService.updatePost(authorId, id, UpdatePostDto);
+  }
+  @Delete('user/:authorId/:id')
+  async deletePost(
+    @Param('authorId', ParseIntPipe) authorId: number,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return await this.postsService.deletePost(authorId, id);
+  }
+}

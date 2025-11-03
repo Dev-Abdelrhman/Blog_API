@@ -55,14 +55,17 @@ export class UsersController {
     return result;
   }
 
-  @Patch(':id/settings')
+  @Patch(':userId/settings')
   @UsePipes(ValidationPipe)
   async updateUserSettings(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('userId', ParseIntPipe) userId: number,
     @Body() updateSettingsDto: UpdateUserSettingsDto,
   ) {
-    const user = await this.usersService.getUserById(id);
-    if (!user) throw new NotFoundException('User not found');
-    return await this.usersService.UpdateUserSettings(id, updateSettingsDto);
+    // const user = await this.usersService.getUserById(userId);
+    // if (!user) throw new NotFoundException('User not found');
+    return await this.usersService.UpdateUserSettings(
+      userId,
+      updateSettingsDto,
+    );
   }
 }

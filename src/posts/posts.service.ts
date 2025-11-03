@@ -1,0 +1,77 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
+
+@Injectable()
+export class PostsService {
+  constructor(private prisma: PrismaService) {}
+
+  async createPost(
+    authorId: number,
+    data: Omit<Prisma.PostCreateInput, 'author'>,
+  ) {
+    return await this.prisma.post.create({
+      data: {
+        ...data,
+        authorId: authorId,
+      },
+    });
+  }
+  async getAllPosts() {
+    return await this.prisma.post.findMany();
+  }
+
+  async getAllPostsByAuthorId(id: number) {
+    const author = await this.prisma.user.findUnique({
+      where: { id },
+    });
+    if (!author) throw new NotFoundException('Author not found');
+    const posts = await this.prisma.post.findMany({
+      where: { authorId: id },
+    });
+    if (!posts || posts.length === 0)
+      throw new NotFoundException('No posts found for this author');
+    return posts;
+  }
+
+  async getPostById(authorId: number, id: number) {
+    const author = await this.prisma.user.findUnique({
+      where: { id: authorId },
+    });
+    if (!author) throw new NotFoundException('Author not found');
+    const post = await this.prisma.post.findUnique({
+      where: { id: id, authorId: authorId },
+    });
+    if (!post) throw new NotFoundException('Post not found for this author');
+    return post;
+  }
+
+  async updatePost(authorId: number, id: number, data: Prisma.PostUpdateInput) {
+    const author = await this.prisma.user.findUnique({
+      where: { id: authorId },
+    });
+    if (!author) throw new NotFoundException('Author not found');
+    const post = await this.prisma.post.findUnique({
+      where: { id: id, authorId: authorId },
+    });
+    if (!post) throw new NotFoundException('Post not found for this author');
+    return await this.prisma.post.update({
+      where: { id: id },
+      data,
+    });
+  }
+  async deletePost(authorId: number, id: number) {
+    const author = await this.prisma.user.findUnique({
+      where: { id: authorId },
+    });
+    if (!author) throw new NotFoundException('Author not found');
+    const post = await this.prisma.post.findUnique({
+      where: { id: id, authorId: authorId },
+    });
+    if (!post) throw new NotFoundException('Post not found for this author');
+    await this.prisma.post.delete({
+      where: { id: id },
+    });
+    return { success: true, message: 'Post deleted successfully' };
+  }
+}
