@@ -10,15 +10,19 @@ import {
   ValidationPipe,
   ParseIntPipe,
   NotFoundException,
+  Inject,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dtos/CreateUser.dto';
 import { UpdateUserDto } from './dtos/UpdateUser.dto';
 import { UpdateUserSettingsDto } from './dtos/UpdateUserSettings.dto';
+import { SerializedUser } from './types/serialize-user.type';
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(@Inject('USER_SERVICE') private usersService: UsersService) {}
 
   @Post()
   @UsePipes(ValidationPipe)
@@ -28,14 +32,16 @@ export class UsersController {
 
   @Get()
   getUsers() {
-    return this.usersService.getUsers();
+    const users = this.usersService.getUsers();
+    return users;
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   async getUserById(@Param('id', ParseIntPipe) id: number) {
     const user = await this.usersService.getUserById(id);
-    if (!user) throw new NotFoundException('User not found');
     return user;
+    // return new SerializedUser(user);
   }
 
   @Patch(':id')
@@ -49,10 +55,7 @@ export class UsersController {
 
   @Delete(':id')
   async deleteUser(@Param('id', ParseIntPipe) id: number) {
-    const user = await this.usersService.getUserById(id);
-    if (!user) throw new NotFoundException('User not found');
-    const result = await this.usersService.deleteUser(id);
-    return result;
+    return await this.usersService.deleteUser(id);
   }
 
   @Patch(':userId/settings')
@@ -61,8 +64,6 @@ export class UsersController {
     @Param('userId', ParseIntPipe) userId: number,
     @Body() updateSettingsDto: UpdateUserSettingsDto,
   ) {
-    // const user = await this.usersService.getUserById(userId);
-    // if (!user) throw new NotFoundException('User not found');
     return await this.usersService.UpdateUserSettings(
       userId,
       updateSettingsDto,

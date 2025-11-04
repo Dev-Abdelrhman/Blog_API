@@ -1,6 +1,8 @@
 import { NotFoundException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { SerializedUser } from './types/serialize-user.type';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -19,7 +21,7 @@ export class UsersService {
     });
   }
   async getUsers() {
-    return await this.prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
       include: {
         settings: {
           select: {
@@ -29,9 +31,10 @@ export class UsersService {
         },
       },
     });
+    return users.map((user) => plainToClass(SerializedUser, user));
   }
   async getUserById(id: number) {
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id },
       include: {
         settings: {
@@ -40,8 +43,16 @@ export class UsersService {
             notifications: true,
           },
         },
+        posts: {
+          select: {
+            title: true,
+          },
+        },
       },
     });
+    if (!user) throw new NotFoundException('User not found');
+    return new SerializedUser(user);
+    // return user;
   }
   async updateUser(id: number, data: Prisma.UserUpdateInput) {
     const findUser = await this.getUserById(id);

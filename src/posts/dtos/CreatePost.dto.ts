@@ -12,8 +12,4 @@ export class CreatePostDto {
   @IsOptional()
   @IsBoolean()
   published?: boolean;
-
-  @IsOptional()
-  @IsString()
-  author?: string;
 }

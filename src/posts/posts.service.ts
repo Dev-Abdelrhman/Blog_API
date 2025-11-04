@@ -8,8 +8,12 @@ export class PostsService {
 
   async createPost(
     authorId: number,
-    data: Omit<Prisma.PostCreateInput, 'author'>,
+    data: Prisma.PostCreateWithoutAuthorInput,
   ) {
+    const author = await this.prisma.user.findUnique({
+      where: { id: authorId },
+    });
+    if (!author) throw new NotFoundException('Author not found');
     return await this.prisma.post.create({
       data: {
         ...data,
