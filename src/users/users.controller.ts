@@ -19,10 +19,9 @@ import { CreateUserDto } from './dtos/CreateUser.dto';
 import { UpdateUserDto } from './dtos/UpdateUser.dto';
 import { UpdateUserSettingsDto } from './dtos/UpdateUserSettings.dto';
 import { SerializedUser } from './types/serialize-user.type';
-
 @Controller('users')
 export class UsersController {
-  constructor(@Inject('USER_SERVICE') private usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   @UsePipes(ValidationPipe)

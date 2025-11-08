@@ -3,14 +3,23 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { SerializedUser } from './types/serialize-user.type';
 import { plainToClass } from 'class-transformer';
+import { hashPassword } from 'src/utils/argon2';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
   async createUser(data: Prisma.UserCreateInput) {
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: data.email },
+    });
+    if (existingUser) {
+      throw new NotFoundException('Email already in use');
+    }
+    const password = await hashPassword(data.password);
     return await this.prisma.user.create({
       data: {
         ...data,
+        password,
         settings: {
           create: {
             theme: 'light',
@@ -51,8 +60,8 @@ export class UsersService {
       },
     });
     if (!user) throw new NotFoundException('User not found');
-    return new SerializedUser(user);
-    // return user;
+    // return new SerializedUser(user);
+    return user;
   }
   async updateUser(id: number, data: Prisma.UserUpdateInput) {
     const findUser = await this.getUserById(id);
@@ -71,6 +80,13 @@ export class UsersService {
   async deleteUser(id: number) {
     const findUser = await this.getUserById(id);
     if (!findUser) throw new NotFoundException('User not found');
+
+    await this.prisma.userSettings.delete({
+      where: { userId: id },
+    });
+    await this.prisma.post.deleteMany({
+      where: { authorId: id },
+    });
     await this.prisma.user.delete({
       where: { id },
     });
@@ -90,5 +106,12 @@ export class UsersService {
       where: { userId },
       data,
     });
+  }
+
+  async findUserByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+    return user;
   }
 }
