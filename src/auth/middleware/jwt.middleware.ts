@@ -5,10 +5,13 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response, NextFunction } from 'express';
-
+import { BlackListService } from '../blacklist.service';
 @Injectable()
 export class JwtMiddleware implements NestMiddleware {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly blacklistService: BlackListService,
+  ) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
     const accessToken = req.cookies?.access_token;
@@ -16,6 +19,15 @@ export class JwtMiddleware implements NestMiddleware {
 
     if (!accessToken && !refreshToken) {
       throw new UnauthorizedException('No authentication token found');
+    }
+    const InvalidToken =
+      await this.blacklistService.isTokenBlacklisted(refreshToken);
+    if (InvalidToken) {
+      res.clearCookie('access_token', { httpOnly: true, sameSite: 'strict' });
+      res.clearCookie('refresh_token', { httpOnly: true, sameSite: 'strict' });
+      throw new UnauthorizedException(
+        'No authentication token found-GO TO HELL',
+      );
     }
 
     try {

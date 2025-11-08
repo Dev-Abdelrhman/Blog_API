@@ -1,14 +1,37 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PostsModule } from './posts/posts.module';
 import { AuthModule } from './auth/auth.module';
+import { JwtMiddleware } from './auth/middleware/jwt.middleware';
+import { RoleMiddleware } from './auth/middleware/role.middleware';
 
 @Module({
-  imports: [UsersModule, PrismaModule, PostsModule, AuthModule],
+  imports: [
+    ScheduleModule.forRoot(),
+    UsersModule,
+    PrismaModule,
+    PostsModule,
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(JwtMiddleware).forRoutes('posts');
+
+    consumer.apply(RoleMiddleware).forRoutes({
+      path: 'posts/user/:authorId',
+      method: RequestMethod.POST,
+    });
+  }
+}

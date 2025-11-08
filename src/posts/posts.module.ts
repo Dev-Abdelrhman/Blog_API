@@ -18,13 +18,4 @@ import { JwtService } from '@nestjs/jwt';
   controllers: [PostsController],
   providers: [PostsService, JwtService],
 })
-export class PostsModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleware).forRoutes('posts');
-
-    consumer.apply(RoleMiddleware).forRoutes({
-      path: 'posts/user/:authorId',
-      method: RequestMethod.POST,
-    });
-  }
-}
+export class PostsModule {}
