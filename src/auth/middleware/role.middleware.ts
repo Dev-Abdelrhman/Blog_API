@@ -28,7 +28,7 @@ export class RoleMiddleware implements NestMiddleware {
     const user = await this.usersService.getUserById(decoded.sub);
     if (user.role !== 'author') {
       throw new ForbiddenException(
-        "You don't have the right access tothis action",
+        "You don't have the right access to this action",
       );
     }
     next();
