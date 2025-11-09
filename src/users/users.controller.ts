@@ -22,13 +22,7 @@ import { SerializedUser } from './types/serialize-user.type';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  @Post()
-  @UsePipes(ValidationPipe)
-  createUser(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createUser(createUserDto);
-  }
-
+  
   @Get()
   getUsers() {
     const users = this.usersService.getUsers();
