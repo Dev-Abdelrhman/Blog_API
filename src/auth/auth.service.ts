@@ -40,6 +40,9 @@ export class AuthService {
   // }
   async login(data: Prisma.UserCreateInput) {
     const user = await this.usersService.findUserByEmail(data.email);
+    if (user?.isActive === false) {
+      await this.usersService.reActive(user.id);
+    }
     if (user) {
       const passwordValid = await comparePasswords(
         data.password,
@@ -62,7 +65,5 @@ export class AuthService {
       };
     }
   }
-  async logout(){
-    
-  }
+  async logout() {}
 }
