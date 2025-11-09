@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { comparePasswords } from '../utils/argon2';
 import { JwtService } from '@nestjs/jwt';
@@ -49,5 +49,20 @@ export class AuthService {
       };
     }
   }
-  async logout() {}
+  async signup(data: Prisma.UserCreateInput) {
+    const newUser = await this.usersService.createUser(data);
+    const { access_token, refresh_token } = await this.generateToken({
+      sub: newUser.id,
+    });
+
+    return {
+      massage: 'Signup successful',
+      access_token: access_token,
+      refresh_token: refresh_token,
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+      },
+    };
+  }
 }
