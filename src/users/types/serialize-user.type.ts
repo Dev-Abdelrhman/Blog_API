@@ -5,6 +5,7 @@ export class SerializedUser {
   name?: string | null;
   settings?: any;
   posts?: any[];
+  role?: string;
 
   @Exclude()
   password: string | null;
