@@ -31,6 +31,9 @@ export class UsersService {
   }
   async getUsers() {
     const users = await this.prisma.user.findMany({
+      where: {
+        isActive: true,
+      },
       include: {
         settings: {
           select: {
@@ -44,7 +47,7 @@ export class UsersService {
   }
   async getUserById(id: number) {
     const user = await this.prisma.user.findUnique({
-      where: { id },
+      where: { id: id, isActive: true },
       include: {
         settings: {
           select: {
@@ -60,8 +63,8 @@ export class UsersService {
       },
     });
     if (!user) throw new NotFoundException('User not found');
-    // return new SerializedUser(user);
-    return user;
+    return new SerializedUser(user);
+    // return user;
   }
   async updateUser(id: number, data: Prisma.UserUpdateInput) {
     const findUser = await this.getUserById(id);
@@ -81,14 +84,21 @@ export class UsersService {
     const findUser = await this.getUserById(id);
     if (!findUser) throw new NotFoundException('User not found');
 
-    await this.prisma.userSettings.delete({
+    await this.prisma.userSettings.updateMany({
       where: { userId: id },
+      data: { isActive: false },
     });
-    await this.prisma.post.deleteMany({
+    await this.prisma.post.updateMany({
       where: { authorId: id },
+      data: {
+        published: false,
+      },
     });
-    await this.prisma.user.delete({
+    await this.prisma.user.update({
       where: { id },
+      data: {
+        isActive: false,
+      },
     });
     return { success: true, message: 'User deleted successfully' };
   }
@@ -113,5 +123,24 @@ export class UsersService {
       where: { email },
     });
     return user;
+  }
+  async reActive(id: number) {
+    await this.prisma.user.update({
+      where: { id },
+      data: {
+        isActive: true,
+      },
+    });
+    await this.prisma.userSettings.updateMany({
+      where: { userId: id },
+      data: { isActive: true },
+    });
+
+    await this.prisma.post.updateMany({
+      where: { authorId: id },
+      data: {
+        published: true,
+      },
+    });
   }
 }
