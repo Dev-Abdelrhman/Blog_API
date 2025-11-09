@@ -22,22 +22,6 @@ export class AuthService {
     });
     return { access_token, refresh_token };
   }
-
-  // async validateUser(data: Prisma.UserLoginInput) {
-  //   const user = await this.usersService.findUserByEmail(data.email);
-  //   if (user) {
-  //     const passwordValid = await comparePasswords(
-  //       data.password,
-  //       user.password,
-  //     );
-  //     if (!passwordValid) {
-  //       throw new UnauthorizedException('Invalid credentials');
-  //     }
-  //     const { password, ...result } = user;
-  //     return result;
-  //   }
-  //   return null;
-  // }
   async login(data: Prisma.UserCreateInput) {
     const user = await this.usersService.findUserByEmail(data.email);
     if (user?.isActive === false) {
