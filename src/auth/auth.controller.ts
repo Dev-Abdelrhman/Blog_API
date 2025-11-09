@@ -42,8 +42,6 @@ export class AuthController {
   @Post('logout')
   async logout(@Request() req, @Response() res) {
     const token = req.cookies?.refresh_token;
-    console.log('Logging out token:', token);
-
     if (!token) {
       throw new UnauthorizedException('forbidden action');
     }
