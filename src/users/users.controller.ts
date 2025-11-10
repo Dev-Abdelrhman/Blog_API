@@ -22,7 +22,7 @@ import { SerializedUser } from './types/serialize-user.type';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-  
+
   @Get()
   getUsers() {
     const users = this.usersService.getUsers();
@@ -37,6 +37,7 @@ export class UsersController {
     // return new SerializedUser(user);
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Patch(':id')
   @UsePipes(ValidationPipe)
   async updateUser(
