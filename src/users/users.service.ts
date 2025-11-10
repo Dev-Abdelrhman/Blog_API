@@ -1,4 +1,8 @@
-import { NotFoundException, Injectable } from '@nestjs/common';
+import {
+  NotFoundException,
+  Injectable,
+  BadRequestException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { SerializedUser } from './types/serialize-user.type';
@@ -34,7 +38,11 @@ export class UsersService {
       where: {
         isActive: true,
       },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
         settings: {
           select: {
             theme: true,
@@ -69,16 +77,29 @@ export class UsersService {
   async updateUser(id: number, data: Prisma.UserUpdateInput) {
     const findUser = await this.getUserById(id);
     if (!findUser) throw new NotFoundException('User not found');
+    if (data.password) {
+      throw new BadRequestException(
+        'Password cannot be updated from this endpoint',
+      );
+    }
     if (data.email) {
       const emailExists = await this.prisma.user.findUnique({
         where: { email: data.email as string },
       });
-      if (emailExists) throw new NotFoundException('Email already in use');
+
+      if (emailExists) {
+        if (emailExists.id === id) {
+          delete data.email;
+        } else {
+          throw new BadRequestException('Email already in use');
+        }
+      }
     }
-    return await this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({
       where: { id },
       data,
     });
+    return new SerializedUser(updatedUser);
   }
   async deleteUser(id: number) {
     const findUser = await this.getUserById(id);
@@ -102,7 +123,6 @@ export class UsersService {
     });
     return { success: true, message: 'User deleted successfully' };
   }
-
   async UpdateUserSettings(
     userId: number,
     data: Prisma.UserSettingsUpdateInput,
@@ -117,7 +137,6 @@ export class UsersService {
       data,
     });
   }
-
   async findUserByEmail(email: string) {
     const user = await this.prisma.user.findUnique({
       where: { email },
