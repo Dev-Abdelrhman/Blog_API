@@ -1,4 +1,9 @@
-import { HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { comparePasswords } from '../utils/argon2';
 import { JwtService } from '@nestjs/jwt';
@@ -24,6 +29,11 @@ export class AuthService {
   }
   async login(data: Prisma.UserCreateInput) {
     const user = await this.usersService.findUserByEmail(data.email);
+    if (!user) {
+      throw new NotFoundException(
+        'You dont have an account here. Please SignUp tp continue',
+      );
+    }
     if (user?.isActive === false) {
       await this.usersService.reActive(user.id);
     }
