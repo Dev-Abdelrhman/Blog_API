@@ -26,8 +26,6 @@ export class PostsController {
   @UsePipes(ValidationPipe)
   async createPost(@Request() req, @Body() CreatePostDto: CreatePostDto) {
     const authorId = req.user.sub;
-    console.log(authorId);
-
     return await this.postsService.createPost(authorId, CreatePostDto);
   }
 

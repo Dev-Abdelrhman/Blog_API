@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SerializedUser } from './types/serialize-user.type';
 import { plainToClass } from 'class-transformer';
 import { hashPassword } from 'src/utils/argon2';
+import { subDays } from 'date-fns';
 
 @Injectable()
 export class UsersService {
@@ -101,7 +102,7 @@ export class UsersService {
     });
     return new SerializedUser(updatedUser);
   }
-  async deleteUser(id: number) {
+  async disActive(id: number) {
     const findUser = await this.getUserById(id);
     if (!findUser) throw new NotFoundException('User not found');
 
@@ -124,7 +125,54 @@ export class UsersService {
         isActive: false,
       },
     });
+    return { success: true, message: 'User disactiveted successfully' };
+  }
+  async deleteUser(id: number) {
+    const findUser = await this.getUserById(id);
+    if (!findUser) throw new NotFoundException('User not found');
+
+    await this.prisma.userSettings.delete({
+      where: { userId: id },
+    });
+    await this.prisma.comment.deleteMany({
+      where: { userId: id },
+    });
+    await this.prisma.post.deleteMany({
+      where: { authorId: id },
+    });
+    await this.prisma.user.delete({
+      where: { id },
+    });
     return { success: true, message: 'User deleted successfully' };
+  }
+  async deleteInactiveUsers(days = 30) {
+    const cutoffDate = subDays(new Date(), days);
+
+    const inactiveUsers = await this.prisma.user.findMany({
+      where: {
+        isActive: false,
+        updatedAt: { lte: cutoffDate },
+      },
+      select: { id: true },
+    });
+
+    if (!inactiveUsers.length) return 0;
+
+    const inactiveUserIds = inactiveUsers.map((u) => u.id);
+
+    await this.prisma.post.deleteMany({
+      where: { authorId: { in: inactiveUserIds } },
+    });
+
+    await this.prisma.comment.deleteMany({
+      where: { userId: { in: inactiveUserIds } },
+    });
+
+    const deleted = await this.prisma.user.deleteMany({
+      where: { id: { in: inactiveUserIds } },
+    });
+
+    return deleted.count;
   }
   async UpdateUserSettings(
     userId: number,

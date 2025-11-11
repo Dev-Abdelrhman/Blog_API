@@ -48,6 +48,10 @@ export class UsersController {
   }
 
   @Delete(':id')
+  async disActive(@Param('id', ParseIntPipe) id: number) {
+    return await this.usersService.disActive(id);
+  }
+  @Delete(':id')
   async deleteUser(@Param('id', ParseIntPipe) id: number) {
     return await this.usersService.deleteUser(id);
   }
