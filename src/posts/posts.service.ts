@@ -24,7 +24,16 @@ export class PostsService {
     });
   }
   async getAllPosts() {
-    return await this.prisma.post.findMany();
+    return await this.prisma.post.findMany({
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
   }
 
   async getAllPostsByAuthorId(id: number) {
@@ -32,6 +41,14 @@ export class PostsService {
     if (!author) throw new NotFoundException('Author not found');
     const posts = await this.prisma.post.findMany({
       where: { authorId: id },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
     if (!posts || posts.length === 0)
       throw new NotFoundException('No posts found for this author');
