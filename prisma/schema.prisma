@@ -45,6 +45,7 @@ model Post {
   privacy   String? @default("public")
   published Boolean  @default(true)
   author    User     @relation(fields: [authorId], references: [id])
+  comments  Comment[]
   authorId  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -54,9 +55,13 @@ model Comment {
   id        Int      @id @default(autoincrement())
   content   String
   react     String?
-  user      User    @relation(fields: [userId],references: [id])
+  user      User     @relation(fields: [userId],references: [id])
+  post      Post     @relation(fields: [postId],references: [id])
   userId    Int
-  parentId    Int?       
-  parent      Comment?   @relation("CommentReplies", fields: [parentId], references: [id])
-  replies     Comment[]  @relation("CommentReplies")
+  parentId  Int?       
+  postId    Int
+  parent    Comment?   @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[]  @relation("CommentReplies")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
