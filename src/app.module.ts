@@ -13,6 +13,8 @@ import { PostsModule } from './posts/posts.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtMiddleware } from './auth/middleware/jwt.middleware';
 import { RoleMiddleware } from './auth/middleware/role.middleware';
+import { CommantsController } from './comments/comments.controller';
+import { CommantsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -21,8 +23,9 @@ import { RoleMiddleware } from './auth/middleware/role.middleware';
     PrismaModule,
     PostsModule,
     AuthModule,
+    CommantsModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, CommantsController],
   providers: [AppService],
 })
 export class AppModule implements NestModule {

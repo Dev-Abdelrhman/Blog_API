@@ -10,6 +10,7 @@ import {
   ValidationPipe,
   ParseIntPipe,
   NotFoundException,
+  Request,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dtos/CreatePost.dto';
@@ -25,24 +26,32 @@ export class PostsController {
   @Post('user/:authorId')
   @UsePipes(ValidationPipe)
   async createPost(
-    @Param('authorId', ParseIntPipe) authorId: number,
+    // @Param('authorId', ParseIntPipe) authorId: number,
+    @Request() req,
     @Body() CreatePostDto: CreatePostDto,
   ) {
+    const authorId = req.user.sub;
+    console.log(authorId);
+
     return await this.postsService.createPost(authorId, CreatePostDto);
   }
 
-  @Get('user/:authorId')
+  @Get('user')
   async getAllPostsByAuthorId(
-    @Param('authorId', ParseIntPipe) authorId: number,
+    @Request() req,
+    // @Param('authorId', ParseIntPipe) authorId: number,
   ) {
+    const authorId = req.user.sub;
     return await this.postsService.getAllPostsByAuthorId(authorId);
   }
 
-  @Get('user/:authorId/:id')
+  @Get('user/:id')
   async getPostById(
-    @Param('authorId', ParseIntPipe) authorId: number,
+    @Request() req,
+    // @Param('authorId', ParseIntPipe) authorId: number,
     @Param('id', ParseIntPipe) id: number,
   ) {
+    const authorId = req.user.sub;
     return await this.postsService.getPostById(authorId, id);
   }
   @Patch('user/:authorId/:id')
