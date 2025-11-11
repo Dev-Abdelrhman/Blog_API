@@ -24,10 +24,7 @@ export class PostsController {
   }
   @Post('user')
   @UsePipes(ValidationPipe)
-  async createPost(
-    @Request() req,
-    @Body() CreatePostDto: CreatePostDto,
-  ) {
+  async createPost(@Request() req, @Body() CreatePostDto: CreatePostDto) {
     const authorId = req.user.sub;
     console.log(authorId);
 
@@ -35,18 +32,14 @@ export class PostsController {
   }
 
   @Get('user')
-  async getAllPostsByAuthorId(
-    @Request() req,
-  ) {
+  async getAllPostsByAuthorId(@Request() req) {
     const authorId = req.user.sub;
     return await this.postsService.getAllPostsByAuthorId(authorId);
   }
 
   @Get('user/:id')
-  async getPostById(
-    @Request() req,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  @UsePipes(ValidationPipe)
+  async getPostById(@Request() req, @Param('id', ParseIntPipe) id: number) {
     const authorId = req.user.sub;
     return await this.postsService.getPostById(authorId, id);
   }
@@ -61,10 +54,7 @@ export class PostsController {
     return await this.postsService.updatePost(authorId, id, UpdatePostDto);
   }
   @Delete('user/:id')
-  async deletePost(
-    @Request() req,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  async deletePost(@Request() req, @Param('id', ParseIntPipe) id: number) {
     const authorId = req.user.sub;
     return await this.postsService.deletePost(authorId, id);
   }
