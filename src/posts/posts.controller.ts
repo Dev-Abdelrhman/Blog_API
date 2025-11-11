@@ -9,7 +9,6 @@ import {
   UsePipes,
   ValidationPipe,
   ParseIntPipe,
-  NotFoundException,
   Request,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
