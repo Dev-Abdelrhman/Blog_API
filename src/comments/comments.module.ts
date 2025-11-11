@@ -9,5 +9,6 @@ import { PostsModule } from 'src/posts/posts.module';
   imports: [UsersModule, PrismaModule, PostsModule],
   providers: [CommantsService],
   controllers: [CommantsController],
+  exports: [CommantsService],
 })
 export class CommantsModule {}
