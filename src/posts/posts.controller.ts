@@ -23,10 +23,9 @@ export class PostsController {
   async getAllPosts() {
     return await this.postsService.getAllPosts();
   }
-  @Post('user/:authorId')
+  @Post('user')
   @UsePipes(ValidationPipe)
   async createPost(
-    // @Param('authorId', ParseIntPipe) authorId: number,
     @Request() req,
     @Body() CreatePostDto: CreatePostDto,
   ) {
@@ -39,7 +38,6 @@ export class PostsController {
   @Get('user')
   async getAllPostsByAuthorId(
     @Request() req,
-    // @Param('authorId', ParseIntPipe) authorId: number,
   ) {
     const authorId = req.user.sub;
     return await this.postsService.getAllPostsByAuthorId(authorId);
@@ -48,26 +46,27 @@ export class PostsController {
   @Get('user/:id')
   async getPostById(
     @Request() req,
-    // @Param('authorId', ParseIntPipe) authorId: number,
     @Param('id', ParseIntPipe) id: number,
   ) {
     const authorId = req.user.sub;
     return await this.postsService.getPostById(authorId, id);
   }
-  @Patch('user/:authorId/:id')
+  @Patch('user/:id')
   @UsePipes(ValidationPipe)
   async updatePost(
-    @Param('authorId', ParseIntPipe) authorId: number,
+    @Request() req,
     @Param('id', ParseIntPipe) id: number,
     @Body() UpdatePostDto: UpdatePostDto,
   ) {
+    const authorId = req.user.sub;
     return await this.postsService.updatePost(authorId, id, UpdatePostDto);
   }
-  @Delete('user/:authorId/:id')
+  @Delete('user/:id')
   async deletePost(
-    @Param('authorId', ParseIntPipe) authorId: number,
+    @Request() req,
     @Param('id', ParseIntPipe) id: number,
   ) {
+    const authorId = req.user.sub;
     return await this.postsService.deletePost(authorId, id);
   }
 }
