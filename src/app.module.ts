@@ -30,7 +30,7 @@ import { CommantsModule } from './comments/comments.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleware).forRoutes('posts', 'posts/:postId');
+    consumer.apply(JwtMiddleware).forRoutes('posts');
 
     consumer.apply(RoleMiddleware).forRoutes({
       path: 'posts/user/:authorId',
