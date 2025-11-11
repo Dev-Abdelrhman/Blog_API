@@ -84,6 +84,9 @@ export class PostsService {
       where: { id: id, authorId: authorId },
     });
     if (!post) throw new NotFoundException('Post not found for this author');
+    await this.prisma.comment.deleteMany({
+      where: { postId: id },
+    });
     await this.prisma.post.delete({
       where: { id: id },
     });

@@ -109,6 +109,9 @@ export class UsersService {
       where: { userId: id },
       data: { isActive: false },
     });
+    await this.prisma.comment.deleteMany({
+      where: { userId: id },
+    });
     await this.prisma.post.updateMany({
       where: { authorId: id },
       data: {
