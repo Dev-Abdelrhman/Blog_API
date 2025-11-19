@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsOptional, IsEmail, IsEnum } from 'class-validator';
 
+
 export class CreateUserDto {
   @IsEmail()
   @IsNotEmpty()
@@ -8,10 +9,6 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsOptional()
   name?: string;
-
-  @IsEnum(['reader', 'author'])
-  @IsOptional()
-  role?: string;
 
   @IsNotEmpty()
   password: string;
