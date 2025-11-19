@@ -1,98 +1,168 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Blog API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A production-ready REST API for a blogging platform built with NestJS, Prisma, and PostgreSQL. It supports user management, authentication, posts, and comments with role-based access control and secure password handling.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- User registration, login, logout with JWT authentication
+- Token blacklist support for logout/invalidation
+- Role-based access control (e.g., admin vs user)
+- CRUD for Posts
+- CRUD for Comments
+- User profile and settings management
+- Input validation with DTOs
+- Hashing with Argon2
+- Prisma ORM with migrations
+- E2E and unit test scaffolding
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Tech Stack
 
-## Project setup
+- Runtime: Node.js
+- Framework: NestJS (TypeScript)
+- ORM: Prisma
+- Database: PostgreSQL (configurable)
+- Auth: JWT (access/refresh optional), role middleware, guards
+- Lint/Format: ESLint, Prettier
+- Package manager: pnpm
+
+## Project Structure
+
+- src/
+  - auth/ – authentication controllers, services, guards, middleware
+  - users/ – user domain (controllers, services, DTOs)
+  - posts/ – posts domain (controllers, services, DTOs)
+  - comments/ – comments domain (controllers, services, DTOs)
+  - prisma/ – PrismaModule/Service integration
+  - utils/ – shared utilities (e.g., Argon2 wrapper)
+- prisma/
+  - schema.prisma – database schema
+  - migrations/ – Prisma migrations
+- test/ – e2e tests
+
+## Getting Started
+
+1) Install dependencies
 
 ```bash
-$ pnpm install
+pnpm install
 ```
 
-## Compile and run the project
+2) Configure environment variables
+
+Create a .env file at the project root. Example:
+
+```env
+# Database
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DB_NAME?schema=public"
+
+# JWT
+JWT_SECRET="your-strong-secret"
+JWT_EXPIRES_IN="15m"
+REFRESH_TOKEN_SECRET="your-strong-refresh-secret"
+REFRESH_TOKEN_EXPIRES_IN="7d"
+
+# Server
+PORT=3000
+NODE_ENV=development
+```
+
+3) Generate Prisma client and run migrations
+
+```bash
+pnpm prisma generate
+pnpm prisma migrate deploy
+# or for local development to create a new migration from schema changes
+# pnpm prisma migrate dev --name init
+```
+
+4) Seed data (optional)
+
+If you have a seed script, run it here. Otherwise, you can create data through the API.
+
+5) Start the application
 
 ```bash
 # development
-$ pnpm run start
+pnpm run start:dev
 
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+# production
+pnpm run build && pnpm run start:prod
 ```
 
-## Run tests
+The API will be available at http://localhost:3000
+
+## NPM Scripts
+
+- start – start in production mode
+- start:dev – start with hot reload
+- start:prod – start compiled dist
+- build – compile TypeScript
+- test – run unit tests
+- test:e2e – run e2e tests
+- test:cov – coverage report
+- lint – run ESLint (if defined)
+- format – run Prettier (if defined)
+
+## API Overview
+
+Routes may be protected with JWT and role middleware. Send the Authorization header: `Bearer <token>`.
+
+- Auth
+  - POST /auth/register – create a new user
+  - POST /auth/login – obtain JWT
+  - POST /auth/logout – invalidate current token (blacklist)
+
+- Users
+  - GET /users – list users (restricted)
+  - GET /users/:id – get a user
+  - PATCH /users/:id – update user (self or admin)
+  - DELETE /users/:id – delete user (admin)
+
+- Posts
+  - GET /posts – list posts
+  - GET /posts/:id – get a post by id
+  - POST /posts – create post (auth required)
+  - PATCH /posts/:id – update post (owner/admin)
+  - DELETE /posts/:id – delete post (owner/admin)
+
+- Comments
+  - GET /comments?postId= – list comments for a post
+  - POST /comments – create comment (auth required)
+  - PATCH /comments/:id – update comment (owner/admin)
+  - DELETE /comments/:id – delete comment (owner/admin)
+
+Note: Exact route names may vary; check the controllers under src/ for authoritative definitions.
+
+## Development Notes
+
+- DTOs enforce validation and shape of requests (class-validator/class-transformer conventions)
+- Middleware:
+  - JWT middleware validates token and attaches user to the request
+  - Role middleware enforces required roles
+- Prisma service provides a single DB client via dependency injection
+- Argon2 utility is used for hashing passwords
+
+## Testing
+
+Run tests locally:
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+pnpm run test
+pnpm run test:e2e
 ```
 
-## Deployment
+## Migrations
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Prisma migration workflow:
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+# create migration from changes in prisma/schema.prisma
+pnpm prisma migrate dev --name <change-name>
+
+# apply existing migrations
+pnpm prisma migrate deploy
 ```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+MIT
