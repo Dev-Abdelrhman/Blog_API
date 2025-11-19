@@ -33,7 +33,7 @@ export class AppModule implements NestModule {
     consumer.apply(JwtMiddleware).forRoutes('posts');
 
     consumer.apply(RoleMiddleware).forRoutes({
-      path: 'posts/user/:authorId',
+      path: 'posts/user',
       method: RequestMethod.POST,
     });
   }
