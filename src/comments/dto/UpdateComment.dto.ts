@@ -12,11 +12,6 @@ export class UpdateCommentDto {
   content?: string;
 
   @IsOptional()
-  @IsString()
-  @IsEnum(['love', 'like', 'care'])
-  react?: string;
-
-  @IsOptional()
   @IsInt()
   parentId?: number;
 }
