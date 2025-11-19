@@ -16,7 +16,8 @@ export class CommantsService {
     private readonly prisma: PrismaService,
     private readonly postService: PostsService,
   ) {}
-  async createComment(data: CreateCommentDto, userId, postId, parentId?) {
+  async createComment(data: CreateCommentDto, userId, postId) {
+    const { parentId, ...commentData } = data;
     const user = await this.userService.getUserById(userId);
     const post = await this.postService.getPostById(userId, postId);
     if (parentId) {
@@ -29,8 +30,7 @@ export class CommantsService {
     }
     return this.prisma.comment.create({
       data: {
-        content: data.content,
-        react: data.react,
+        ...commentData,
         user: { connect: { id: userId } },
         post: { connect: { id: postId } },
         parent: parentId ? { connect: { id: parentId } } : undefined,
@@ -54,7 +54,7 @@ export class CommantsService {
         post: {
           select: {
             id: true,
-            title:true
+            title: true,
           },
         },
       },
