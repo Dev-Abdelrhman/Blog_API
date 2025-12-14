@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "dev_server": "lerna run start --scope=project_test",
-    "dev_front": "lerna run dev --scope=task-management",
-    "dev": "concurrently \"lerna run start --scope=backend\"  \"lerna run dev --scope=task-management\""
+    "dev_front": "lerna run dev --scope=client",
+    "dev": "concurrently \"lerna run start --scope=project_test\"  \"lerna run dev --scope=client\""
   }
 }
