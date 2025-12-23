@@ -1,0 +1,175 @@
+{
+  "UsersAPI ": {
+    "STATUS": "under development",
+    "Login": {
+      "method": "POST",
+      "url": "http://localhost:9000/api/auth/login",
+      "body": {
+        "email": "user@example.com",
+        "password": "password123"
+      }
+    },
+    "Signup": {
+      "method": "POST",
+      "url": "http://localhost:9000/api/auth/signup",
+      "body": {
+        "email": "user@example.com",
+        "name": "John Doe",
+        "password": "password123"
+      }
+    },
+    "Logout": {
+      "method": "POST",
+      "url": "http://localhost:9000/api/auth/logout"
+    },
+    "Get All Users": {
+      "method": "GET",
+      "url": "http://localhost:9000/api/users"
+    },
+    "Get User by ID": {
+      "method": "GET",
+      "url": "http://localhost:9000/api/users/:id"
+    },
+    "Update User": {
+      "method": "PATCH",
+      "url": "http://localhost:9000/api/users/:id",
+      "body": {
+        "email": "newemail@example.com",
+        "name": "Updated Name"
+      }
+    },
+    "Delete User": {
+      "method": "DELETE",
+      "url": "http://localhost:9000/api/users/:id"
+    },
+    "Update User Settings": {
+      "method": "PATCH",
+      "url": "http://localhost:9000/api/users/:userId/settings",
+      "body": {
+        "theme": "dark",
+        "notifications": true
+      }
+    }
+  },
+  "PostsAPI": {
+    "STATUS": "under development",
+    "Get All Posts": {
+      "method": "GET",
+      "url": "http://localhost:9000/api/posts"
+    },
+    "Create User Post": {
+      "method": "POST",
+      "url": "http://localhost:9000/api/posts/user",
+      "body": {
+        "title": "Sample Post",
+        "content": "This is the content of the post.",
+        "published": true
+      }
+    },
+    "Get User Posts": {
+      "method": "GET",
+      "url": "http://localhost:9000/api/posts/user"
+    },
+    "Get User Post by ID": {
+      "method": "GET",
+      "url": "http://localhost:9000/api/posts/user/:id"
+    },
+    "Update User Post": {
+      "method": "PATCH",
+      "url": "http://localhost:9000/api/posts/user/:id",
+      "body": {
+        "title": "Updated Title",
+        "content": "Updated content.",
+        "published": false
+      }
+    },
+    "Delete User Post": {
+      "method": "DELETE",
+      "url": "http://localhost:9000/api/posts/user/:id"
+    }
+  },
+  "CommentsAPI": {
+    "STATUS": "under development",
+    "Create Comment": {
+      "method": "POST",
+      "url": "http://localhost:9000/api/posts/:postId/comments",
+      "body": {
+        "content": "This is a comment.",
+        "parentId": null
+      }
+    },
+    "Get Post Comments": {
+      "method": "GET",
+      "url": "http://localhost:9000/api/posts/:postId/comments"
+    },
+    "Update Comment": {
+      "method": "PATCH",
+      "url": "http://localhost:9000/api/posts/:postId/comments/:id",
+      "body": {
+        "content": "Updated comment.",
+        "parentId": 1
+      }
+    },
+    "Delete Comment": {
+      "method": "DELETE",
+      "url": "http://localhost:9000/api/posts/:postId/comments/:id"
+    }
+  },
+  "Examples": {
+    "STATUS": "Reference Data",
+    "User Example": {
+      "id": 1,
+      "email": "user@example.com",
+      "name": "John Doe",
+      "role": "reader",
+      "isActive": true,
+      "createdAt": "2025-12-23T00:00:00.000Z",
+      "updatedAt": "2025-12-23T00:00:00.000Z",
+      "settings": {
+        "id": 1,
+        "theme": "light",
+        "notifications": false,
+        "isActive": true,
+        "userId": 1,
+        "createdAt": "2025-12-23T00:00:00.000Z",
+        "updatedAt": "2025-12-23T00:00:00.000Z"
+      }
+    },
+    "Post Example": {
+      "id": 1,
+      "title": "Sample Post",
+      "content": "This is the content of the post.",
+      "privacy": "public",
+      "published": true,
+      "authorId": 1,
+      "createdAt": "2025-12-23T00:00:00.000Z",
+      "updatedAt": "2025-12-23T00:00:00.000Z"
+    },
+    "Comment Example": {
+      "id": 1,
+      "content": "This is a comment.",
+      "react": "like",
+      "userId": 1,
+      "postId": 1,
+      "parentId": null,
+      "createdAt": "2025-12-23T00:00:00.000Z",
+      "updatedAt": "2025-12-23T00:00:00.000Z"
+    },
+    "Auth Response Example": {
+      "access_token": "jwt_access_token_here",
+      "refresh_token": "jwt_refresh_token_here",
+      "user": {
+        "id": 1,
+        "email": "user@example.com",
+        "name": "John Doe",
+        "role": "reader"
+      }
+    }
+  },
+  "IMPORTANT NOTES": {
+    "Authentication": "All endpoints except login and signup require authentication via Bearer token in the Authorization header",
+    "Role-Based Access": "Some endpoints may be restricted based on user roles (reader, author, admin, etc.)",
+    "Validation": "All request bodies are validated - ensure required fields are provided",
+    "Error Handling": "Standard HTTP status codes are used (200, 201, 400, 401, 403, 404, 500)"
+  }
+}
