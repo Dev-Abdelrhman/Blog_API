@@ -11,9 +11,9 @@ import {
   ParseIntPipe,
   Request,
 } from '@nestjs/common';
-import { PostsService } from './posts.service';
-import { CreatePostDto } from './dtos/CreatePost.dto';
-import { UpdatePostDto } from './dtos/UpdatePost.dto';
+import { PostsService } from './posts.service.js';
+import { CreatePostDto } from './dtos/CreatePost.dto.js';
+import { UpdatePostDto } from './dtos/UpdatePost.dto.js';
 
 @Controller('posts')
 export class PostsController {
