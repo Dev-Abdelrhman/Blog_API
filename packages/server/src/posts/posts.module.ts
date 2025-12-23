@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { PostsController } from './posts.controller';
-import { PostsService } from './posts.service';
-import { PrismaModule } from 'src/prisma/prisma.module';
-import { UsersModule } from 'src/users/users.module';
-import { AuthModule } from '../auth/auth.module';
+import { PostsController } from './posts.controller.js';
+import { PostsService } from './posts.service.js';
+import { PrismaModule } from '../prisma/prisma.module.js';
+import { UsersModule } from '../users/users.module.js';
+import { AuthModule } from '../auth/auth.module.js';
 import { JwtService } from '@nestjs/jwt';
 
 @Module({
