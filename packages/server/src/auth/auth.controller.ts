@@ -10,10 +10,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from './auth.service';
-import { BlackListService } from './blacklist.service';
-import { loginDto } from './dto/auth.dto';
-import { CreateUserDto } from 'src/users/dtos/CreateUser.dto';
+import { AuthService } from './auth.service.js';
+import { BlackListService } from './blacklist.service.js';
+import { loginDto } from './dto/auth.dto.js';
+import { CreateUserDto } from '../users/dtos/CreateUser.dto.js';
 // import { LocalAuthGuard } from './utils/local-auth-guard';
 
 @Controller('auth')
