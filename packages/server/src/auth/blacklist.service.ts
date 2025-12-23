@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../prisma/generated/prisma/client.js';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
 export class BlackListService {
@@ -16,9 +16,13 @@ export class BlackListService {
         data: { token },
       });
     } catch (error) {
-      if (error.code !== 'P2002') {
-        throw error;
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code !== 'P2002') {
+          throw error;
+        }
+        return;
       }
+      throw error;
     }
   }
   async isTokenBlacklisted(token: string) {
