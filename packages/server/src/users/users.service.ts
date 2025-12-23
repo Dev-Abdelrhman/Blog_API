@@ -3,25 +3,29 @@ import {
   Injectable,
   BadRequestException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
-import { SerializedUser } from './types/serialize-user.type';
+import { Prisma } from '../../prisma/generated/prisma/client.js';
+import { PrismaService } from '../prisma/prisma.service.js'
+import { SerializedUser } from './types/serialize-user.type.js';
 import { plainToClass } from 'class-transformer';
-import { hashPassword } from 'src/utils/argon2';
+import { hashPassword } from '../utils/argon2.js';
 import { subDays } from 'date-fns';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
+
   async createUser(data: Prisma.UserCreateInput) {
     const existingUser = await this.prisma.user.findUnique({
       where: { email: data.email },
     });
+
     if (existingUser) {
-      throw new NotFoundException('Email already in use');
+      throw new BadRequestException('Email already in use');
     }
+
     const password = await hashPassword(data.password);
-    return await this.prisma.user.create({
+
+    return this.prisma.user.create({
       data: {
         ...data,
         password,
@@ -34,11 +38,10 @@ export class UsersService {
       },
     });
   }
+
   async getUsers() {
     const users = await this.prisma.user.findMany({
-      where: {
-        isActive: true,
-      },
+      where: { isActive: true },
       select: {
         id: true,
         name: true,
@@ -52,8 +55,10 @@ export class UsersService {
         },
       },
     });
+
     return users.map((user) => plainToClass(SerializedUser, user));
   }
+
   async getUserById(id: number) {
     const user = await this.prisma.user.findUnique({
       where: { id: id, isActive: true },
@@ -71,80 +76,86 @@ export class UsersService {
         },
       },
     });
+
     if (!user) throw new NotFoundException('User not found');
+
     return new SerializedUser(user);
-    // return user;
   }
+
   async updateUser(id: number, data: Prisma.UserUpdateInput) {
-    const findUser = await this.getUserById(id);
-    if (!findUser) throw new NotFoundException('User not found');
+    await this.getUserById(id);
+
     if (data.password) {
       throw new BadRequestException(
         'Password cannot be updated from this endpoint',
       );
     }
+
     if (data.email) {
       const emailExists = await this.prisma.user.findUnique({
         where: { email: data.email as string },
       });
 
-      if (emailExists) {
-        if (emailExists.id === id) {
-          delete data.email;
-        } else {
-          throw new BadRequestException('Email already in use');
-        }
+      if (emailExists && emailExists.id !== id) {
+        throw new BadRequestException('Email already in use');
       }
     }
+
     const updatedUser = await this.prisma.user.update({
       where: { id },
       data,
     });
+
     return new SerializedUser(updatedUser);
   }
+
   async disActive(id: number) {
-    const findUser = await this.getUserById(id);
-    if (!findUser) throw new NotFoundException('User not found');
+    await this.getUserById(id);
 
     await this.prisma.userSettings.updateMany({
       where: { userId: id },
       data: { isActive: false },
     });
+
     await this.prisma.comment.deleteMany({
       where: { userId: id },
     });
+
     await this.prisma.post.updateMany({
       where: { authorId: id },
-      data: {
-        published: false,
-      },
+      data: { published: false },
     });
+
     await this.prisma.user.update({
       where: { id },
-      data: {
-        isActive: false,
-      },
+      data: { isActive: false },
     });
-    return { success: true, message: 'User disactiveted successfully' };
+
+    return { success: true, message: 'User deactivated successfully' };
   }
+
   async deleteUser(id: number) {
-    const findUser = await this.getUserById(id);
-    if (!findUser) throw new NotFoundException('User not found');
+    await this.getUserById(id);
 
     await this.prisma.userSettings.delete({
       where: { userId: id },
     });
+
     await this.prisma.comment.deleteMany({
       where: { userId: id },
     });
+
     await this.prisma.post.deleteMany({
       where: { authorId: id },
     });
+
     await this.prisma.user.delete({
       where: { id },
     });
+
     return { success: true, message: 'User deleted successfully' };
   }
+
   async deleteInactiveUsers(days = 30) {
     const cutoffDate = subDays(new Date(), days);
 
@@ -158,49 +169,51 @@ export class UsersService {
 
     if (!inactiveUsers.length) return 0;
 
-    const inactiveUserIds = inactiveUsers.map((u) => u.id);
+    const ids = inactiveUsers.map((u) => u.id);
 
     await this.prisma.post.deleteMany({
-      where: { authorId: { in: inactiveUserIds } },
+      where: { authorId: { in: ids } },
     });
 
     await this.prisma.comment.deleteMany({
-      where: { userId: { in: inactiveUserIds } },
+      where: { userId: { in: ids } },
     });
 
     const deleted = await this.prisma.user.deleteMany({
-      where: { id: { in: inactiveUserIds } },
+      where: { id: { in: ids } },
     });
 
     return deleted.count;
   }
-  async UpdateUserSettings(
+
+  async updateUserSettings(
     userId: number,
     data: Prisma.UserSettingsUpdateInput,
   ) {
-    const findUser = await this.getUserById(userId);
-    if (!findUser) throw new NotFoundException('User not found');
-    if (!findUser.settings) {
-      throw new NotFoundException('bad request: settings not found');
+    const user = await this.getUserById(userId);
+
+    if (!user.settings) {
+      throw new BadRequestException('Settings not found');
     }
-    return await this.prisma.userSettings.update({
+
+    return this.prisma.userSettings.update({
       where: { userId },
       data,
     });
   }
+
   async findUserByEmail(email: string) {
-    const user = await this.prisma.user.findUnique({
+    return this.prisma.user.findUnique({
       where: { email },
     });
-    return user;
   }
+
   async reActive(id: number) {
     await this.prisma.user.update({
       where: { id },
-      data: {
-        isActive: true,
-      },
+      data: { isActive: true },
     });
+
     await this.prisma.userSettings.updateMany({
       where: { userId: id },
       data: { isActive: true },
@@ -208,9 +221,7 @@ export class UsersService {
 
     await this.prisma.post.updateMany({
       where: { authorId: id },
-      data: {
-        published: true,
-      },
+      data: { published: true },
     });
   }
 }
