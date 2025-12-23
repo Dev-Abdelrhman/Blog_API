@@ -1,7 +1,8 @@
+import  "dotenv/config.js"
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 
-import { AppModule } from './app.module';
+import { AppModule } from './app.module.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,10 +12,12 @@ async function bootstrap() {
     origin: ['*'],
     credentials: true,
   });
+  
   app.setGlobalPrefix('api');
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT || 3000
+  await app.listen(port);
   console.log(
-    `Application is running on:http://localhost:${process.env.PORT ?? 3000}/api`,
+    `Application is running on:http://localhost:${port}/api`,
   );
 }
 bootstrap();
