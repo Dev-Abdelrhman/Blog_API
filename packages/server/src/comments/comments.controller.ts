@@ -11,9 +11,9 @@ import {
   ParseIntPipe,
   Request,
 } from '@nestjs/common';
-import { CommantsService } from './comments.service';
-import { CreateCommentDto } from './dto/CreateComment.dto';
-import { UpdateCommentDto } from './dto/UpdateComment.dto';
+import { CommantsService } from './comments.service.js';
+import { CreateCommentDto } from './dto/CreateComment.dto.js';
+import { UpdateCommentDto } from './dto/UpdateComment.dto.js';
 
 @Controller('posts/:postId/comments')
 export class CommantsController {
