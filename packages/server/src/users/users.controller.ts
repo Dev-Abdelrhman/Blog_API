@@ -14,11 +14,11 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dtos/CreateUser.dto';
-import { UpdateUserDto } from './dtos/UpdateUser.dto';
-import { UpdateUserSettingsDto } from './dtos/UpdateUserSettings.dto';
-import { SerializedUser } from './types/serialize-user.type';
+import { UsersService } from './users.service.js';
+import { CreateUserDto } from './dtos/CreateUser.dto.js';
+import { UpdateUserDto } from './dtos/UpdateUser.dto.js';
+import { UpdateUserSettingsDto } from './dtos/UpdateUserSettings.dto.js';
+import { SerializedUser } from './types/serialize-user.type.js';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -62,7 +62,7 @@ export class UsersController {
     @Param('userId', ParseIntPipe) userId: number,
     @Body() updateSettingsDto: UpdateUserSettingsDto,
   ) {
-    return await this.usersService.UpdateUserSettings(
+    return await this.usersService.updateUserSettings(
       userId,
       updateSettingsDto,
     );
