@@ -4,10 +4,11 @@ import {
   UnauthorizedException,
   NotFoundException,
 } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { comparePasswords } from '../utils/argon2';
+import { UsersService } from '../users/users.service.js';
+import { comparePasswords } from '../utils/argon2.js';
 import { JwtService } from '@nestjs/jwt';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../prisma/generated/prisma/client.js';
+
 
 @Injectable()
 export class AuthService {
