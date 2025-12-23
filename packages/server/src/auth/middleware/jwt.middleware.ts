@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response, NextFunction } from 'express';
-import { BlackListService } from '../blacklist.service';
+import { BlackListService } from '../blacklist.service.js';
 @Injectable()
 export class JwtMiddleware implements NestMiddleware {
   constructor(
@@ -37,9 +37,9 @@ export class JwtMiddleware implements NestMiddleware {
       req['user'] = decoded;
       return next();
     } catch (error) {
-      console.log('');
+      const err = error as Error
 
-      if (error.name === 'TokenExpiredError' && refreshToken) {
+      if (err.name === 'TokenExpiredError' && refreshToken) {
         try {
           const decodedRefresh = await this.jwtService.verifyAsync(
             refreshToken,
