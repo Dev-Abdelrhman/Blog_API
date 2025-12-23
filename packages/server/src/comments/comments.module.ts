@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { CommantsService } from './comments.service';
-import { CommantsController } from './comments.controller';
-import { UsersModule } from 'src/users/users.module';
-import { PrismaModule } from 'src/prisma/prisma.module';
-import { PostsModule } from 'src/posts/posts.module';
+import { CommantsService } from './comments.service.js';
+import { CommantsController } from './comments.controller.js';
+import { UsersModule } from '../users/users.module.js';
+import { PrismaModule } from '../prisma/prisma.module.js';
+import { PostsModule } from '../posts/posts.module.js';
 
 @Module({
   imports: [UsersModule, PrismaModule, PostsModule],
