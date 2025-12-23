@@ -3,11 +3,11 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { PostsService } from 'src/posts/posts.service';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { UsersService } from 'src/users/users.service';
-import { CreateCommentDto } from './dto/CreateComment.dto';
+import { Prisma } from '../../prisma/generated/prisma/client.js';
+import { PostsService } from '../posts/posts.service.js';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { UsersService } from '../users/users.service.js';
+import { CreateCommentDto } from './dto/CreateComment.dto.js';
 
 @Injectable()
 export class CommantsService {
